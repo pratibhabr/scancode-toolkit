@@ -30,5 +30,8 @@ RUN ./scancode --reindex-licenses
 # Add scancode to path
 ENV PATH=$HOME/scancode-toolkit:$PATH
 
+# Increase pip timeout, in case of slow repository response
+ENV PIP_DEFAULT_TIMEOUT=100
+
 # Set entrypoint to be the scancode command, allows to run the generated docker image directly with the scancode arguments: `docker run (...) <containername> <scancode arguments>`
 ENTRYPOINT ["./scancode"]

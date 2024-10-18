@@ -24,6 +24,9 @@ COPY . scancode-toolkit
 # Set workdir
 WORKDIR scancode-toolkit
 
+# Increase pip timeout, in case of slow repository response
+ENV PIP_DEFAULT_TIMEOUT=100
+
 # Run scancode once for initial configuration, with --reindex-licenses to create the base license index
 RUN ./scancode --reindex-licenses
 

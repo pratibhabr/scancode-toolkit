@@ -1,17 +1,11 @@
-#
-# Copyright (c) nexB Inc. and others. All rights reserved.
-# ScanCode is a trademark of nexB Inc.
-# SPDX-License-Identifier: Apache-2.0
-# See http://www.apache.org/licenses/LICENSE-2.0 for the license text.
-# See https://github.com/nexB/scancode-toolkit for support or download.
-# See https://aboutcode.org for more information about nexB OSS projects.
-#
+FROM python:3.6-slim-buster
 
-FROM python:3.6-slim-buster 
+# Set pip default timeout
+ENV PIP_DEFAULT_TIMEOUT=60
 
-# Requirements as per https://scancode-toolkit.readthedocs.io/en/latest/getting-started/install.html
+# Install dependencies
 RUN apt-get update \
- && apt-get install -y bzip2 xz-utils zlib1g libxml2-dev libxslt1-dev libgomp1 libpopt0\
+ && apt-get install -y bzip2 xz-utils zlib1g libxml2-dev libxslt1-dev libgomp1 libpopt0 \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
@@ -24,17 +18,13 @@ COPY . scancode-toolkit
 # Set workdir
 WORKDIR scancode-toolkit
 
-# Increase pip timeout, in case of slow repository response
-ENV PIP_DEFAULT_TIMEOUT=100
-
-# Run scancode once for initial configuration, with --reindex-licenses to create the base license index
+# Install required packages (including fingerprints)
+RUN pip install "fingerprints>=0.6.0"  # Adjust based on your needs
+# Run scancode for initial configuration
 RUN ./scancode --reindex-licenses
 
 # Add scancode to path
 ENV PATH=$HOME/scancode-toolkit:$PATH
 
-# Increase pip timeout, in case of slow repository response
-ENV PIP_DEFAULT_TIMEOUT=100
-
-# Set entrypoint to be the scancode command, allows to run the generated docker image directly with the scancode arguments: `docker run (...) <containername> <scancode arguments>`
+# Set entrypoint to be the scancode command
 ENTRYPOINT ["./scancode"]
